@@ -1,7 +1,10 @@
-//create variable that selects div with a class of "overview"
+//variable to select div with a class of "overview"
 const overview = document.querySelector(".overview");
-//create variable for github username
+//variable for github username
 const username = "Tomomi-K1";
+//variable to select ul
+const repoList = document.querySelector(".repo-list");
+console.log(repoList);
 
 //create function to fetch github profile info
 const getProfileData = async function(username){
@@ -11,7 +14,7 @@ const getProfileData = async function(username){
 
     //call function to display profile data
     displayData(data);
-}
+};
 
 getProfileData(username);
 
@@ -29,6 +32,27 @@ const displayData = function(data){
           <p><strong>Location:</strong> ${data.location}</p>
           <p><strong>Number of public repos:</strong> ${data.public_repos}</p>
         </div>
-        `
+        `;
     overview.append(div);
+
+    getRepoList();
+};
+
+//fetch repo list data
+const getRepoList = async function(){
+    const repo = await fetch(`https://api.github.com/users/${username}/repos?per_page=100&sort=updated`);
+    const repos = await repo.json();
+    console.log(repos);
+
+    displayRepos(repos);
+};
+
+
+const displayRepos = function(repos){
+    for(const repo of repos){
+        const li = document.createElement("li");
+        li.classList.add("repo");
+        li.innerHTML = `<h3>${repo.name}</h3>`;
+        repoList.append(li);
+    };
 };
