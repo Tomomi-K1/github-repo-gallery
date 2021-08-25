@@ -4,7 +4,11 @@ const overview = document.querySelector(".overview");
 const username = "Tomomi-K1";
 //variable to select ul
 const repoList = document.querySelector(".repo-list");
-console.log(repoList);
+//variable to select a class of ".repos"
+const repoArea = document.querySelector(".repos");
+//variable to select a class of ".repo-data"
+const repoDataArea = document.querySelector(".repo-data");
+
 
 //create function to fetch github profile info
 const getProfileData = async function(username){
@@ -55,4 +59,47 @@ const displayRepos = function(repos){
         li.innerHTML = `<h3>${repo.name}</h3>`;
         repoList.append(li);
     };
+};
+
+repoList.addEventListener("click", function(e){
+    if(e.target.matches("h3")){
+        const repoName =e.target.innerText;
+        getRepoInfo(repoName);
+    }
+});
+
+const getRepoInfo  = async function(repoName){
+    const response = await fetch(`https://api.github.com/repos/${username}/${repoName}`);
+    const repoInfo = await response.json();
+    console.log(repoInfo);
+    //getting language info
+    const fetchLangages = await fetch(repoInfo.languages_url);
+    const languageData = await fetchLangages.json();
+    console.log(languageData);
+
+    //make a list of languages
+    const languages = [];
+    for(let language in languageData){
+        languages.push(language);
+        console.log(languages);
+    };
+
+    displaySingleRepoInfo(repoInfo, languages);
+};
+
+const displaySingleRepoInfo = function(repoInfo, languages){
+    repoDataArea.innerHTML = "";
+    repoDataArea.classList.remove("hide");
+    repoArea.classList.add("hide");
+    //create "div" and insert repo info
+    const infoArea = document.createElement("div");
+    infoArea.innerHTML = `
+        <h3>Name: ${repoInfo.name}</h3>
+            <p>Description: ${repoInfo.description}</p>
+            <p>Default Branch: ${repoInfo.default_branch}</p>
+            <p>Languages: ${languages.join(", ")}</p>
+            <a class="visit" href="${repoInfo.html_url}" target="_blank" rel="noreferrer noopener">View Repo on GitHub!</a>
+        `
+    repoDataArea.append(infoArea);
+
 };
